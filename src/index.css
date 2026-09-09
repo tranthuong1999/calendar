@@ -1,0 +1,1123 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+
+  color: #202124;
+  background: #fff;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+/* ========================================
+   APP
+======================================== */
+
+.calendar-app {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #fff;
+}
+
+/* ========================================
+   HEADER
+======================================== */
+
+.calendar-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #fff;
+  border-bottom: 1px solid #dadce0;
+
+  /*
+   * Chừa chỗ cho scrollbar dọc giống vùng cuộn bên dưới
+   * để header và lưới luôn thẳng cột.
+   */
+  scrollbar-gutter: stable;
+  overflow: hidden;
+}
+
+.calendar-toolbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid #f1f3f4;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar-left h1 {
+  margin: 0 0 0 20px;
+  font-size: 20px;
+  font-weight: 400;
+  color: #3c4043;
+}
+
+.nav-button {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #5f6368;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.nav-button:hover {
+  background: #f1f3f4;
+}
+
+.today-button {
+  height: 36px;
+  padding: 0 16px;
+  margin-left: 10px;
+
+  border: 1px solid #dadce0;
+  border-radius: 5px;
+
+  background: #fff;
+  color: #3c4043;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.today-button:hover {
+  background: #f8f9fa;
+}
+
+/* ========================================
+   DAY HEADER
+======================================== */
+
+.days-header {
+  display: grid;
+
+  grid-template-columns:
+    72px repeat(7,
+      minmax(140px, 1fr));
+
+  min-width: 1050px;
+}
+
+.time-header-cell {
+  border-right: 1px solid #dadce0;
+}
+
+.day-header {
+  height: 70px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  border-left: 1px solid #dadce0;
+
+  gap: 5px;
+}
+
+.day-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: #70757a;
+  letter-spacing: 0.5px;
+}
+
+.day-number {
+  width: 34px;
+  height: 34px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  font-size: 17px;
+  font-weight: 400;
+
+  color: #3c4043;
+}
+
+.day-number-today {
+  background: #1a73e8;
+  color: #fff;
+}
+
+/* ========================================
+   BODY
+======================================== */
+
+.calendar-body {
+  height: calc(100vh - 134px);
+  overflow: hidden;
+}
+
+.calendar-scroll {
+  width: 100%;
+  height: 100%;
+
+  overflow: auto;
+
+  /*
+   * Luôn dành chỗ cho scrollbar dọc để chiều rộng
+   * vùng lưới không đổi và khớp với header.
+   */
+  scrollbar-gutter: stable;
+}
+
+.calendar-grid {
+  display: grid;
+
+  grid-template-columns:
+    72px repeat(7,
+      minmax(140px, 1fr));
+
+  min-width: 1050px;
+
+  position: relative;
+}
+
+/* ========================================
+   TIME COLUMN
+======================================== */
+
+.time-column {
+  background: #fff;
+  border-right: 1px solid #dadce0;
+}
+
+.time-label {
+  position: relative;
+
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+
+  padding: 0 8px 0 0;
+
+  color: #70757a;
+
+  font-size: 11px;
+}
+
+/*
+ * Nhãn giờ được đẩy lên -6px để tâm dòng chữ
+ * nằm ngay trên đường kẻ ranh giới đầu mỗi giờ,
+ * căn thẳng với border-bottom của .hour-row.
+ */
+.time-label span {
+  transform: translateY(-6px);
+
+  background: #fff;
+
+  padding-left: 4px;
+}
+
+/*
+ * Nhãn 00:00 nằm ở đỉnh lưới nên không đẩy lên
+ * để tránh bị cắt.
+ */
+.time-label:first-child span {
+  transform: none;
+}
+
+/* ========================================
+   DAY COLUMN
+======================================== */
+
+.day-column {
+  position: relative;
+
+  border-left: 1px solid #dadce0;
+
+  background: #fff;
+
+  user-select: none;
+}
+
+/* ========================================
+   HOUR GRID
+======================================== */
+
+.hour-row {
+  position: relative;
+
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.half-hour-line {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+
+  top: 50%;
+
+  border-top: 1px dashed #f0f0f0;
+}
+
+/* ========================================
+   CURRENT TIME
+======================================== */
+
+.current-time-line {
+  position: absolute;
+
+  left: 0;
+  right: 0;
+
+  height: 2px;
+
+  background: #ea4335;
+
+  z-index: 8;
+
+  pointer-events: none;
+}
+
+.current-time-dot {
+  position: absolute;
+
+  width: 9px;
+  height: 9px;
+
+  left: -4px;
+  top: -4px;
+
+  border-radius: 50%;
+
+  background: #ea4335;
+}
+
+/* ========================================
+   EVENT
+======================================== */
+
+.event-card {
+  position: absolute;
+
+  left: 4px;
+  right: 4px;
+
+  z-index: 10;
+
+  overflow: hidden;
+
+  padding: 7px 9px;
+
+  border-radius: 6px;
+
+  background: #1a73e8;
+
+  color: #fff;
+
+  border-left: 3px solid #1558b0;
+
+  box-shadow:
+    0 1px 2px rgba(60, 64, 67, 0.25);
+
+  /*
+   * Đảm bảo luôn đủ chỗ cho tiêu đề + giờ (2 dòng nhỏ)
+   * kể cả event ngắn vài phút.
+   */
+  min-height: 30px;
+
+  cursor: grab;
+
+  transition:
+    box-shadow 0.12s,
+    opacity 0.12s;
+
+  touch-action: none;
+}
+
+.event-card:hover {
+  box-shadow:
+    0 2px 6px rgba(60, 64, 67, 0.3);
+}
+
+.event-card:active {
+  cursor: grabbing;
+}
+
+.event-card-dragging {
+  opacity: 0.85;
+
+  cursor: grabbing;
+
+  z-index: 30;
+
+  box-shadow:
+    0 4px 12px rgba(60, 64, 67, 0.4);
+
+  /*
+   * Cho con trỏ "xuyên qua" card đang kéo để
+   * elementsFromPoint xác định đúng cột ngày bên dưới,
+   * phục vụ kéo ngang sang ngày khác.
+   */
+  pointer-events: none;
+}
+
+.event-title {
+  font-size: 13px;
+  font-weight: 600;
+
+  line-height: 18px;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-time {
+  margin-top: 2px;
+
+  font-size: 11px;
+
+  opacity: 0.9;
+}
+
+/*
+ * Event ngắn (15/30 phút): thu nhỏ padding và hiển thị
+ * title + time trên cùng một dòng để không bị cắt chữ.
+ */
+/*
+ * Compact: event ngắn vẫn hiển thị đủ tiêu đề + giờ,
+ * nhưng thu nhỏ cỡ chữ và line-height sát để vừa chiều cao.
+ */
+.event-card-compact {
+  padding: 1px 8px;
+}
+
+.event-card-compact .event-title {
+  font-size: 11px;
+
+  line-height: 1.25;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-card-compact .event-time {
+  margin-top: 0;
+
+  font-size: 9px;
+
+  line-height: 1.2;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-description {
+  margin-top: 5px;
+
+  font-size: 11px;
+
+  line-height: 15px;
+
+  opacity: 0.9;
+
+  overflow: hidden;
+}
+
+/* ========================================
+   DRAG SELECTION
+======================================== */
+
+.selection-preview {
+  position: absolute;
+
+  left: 2px;
+  right: 2px;
+
+  z-index: 5;
+
+  border: 1px solid #1a73e8;
+
+  border-radius: 4px;
+
+  background: rgba(26,
+      115,
+      232,
+      0.15);
+
+  pointer-events: none;
+}
+
+/* ========================================
+   CONTEXT MENU
+======================================== */
+
+.context-menu {
+  position: fixed;
+
+  z-index: 100;
+
+  width: 170px;
+
+  padding: 6px 0;
+
+  border: 1px solid #dadce0;
+
+  border-radius: 8px;
+
+  background: #fff;
+
+  box-shadow:
+    0 4px 12px rgba(60, 64, 67, 0.25);
+}
+
+.context-menu-item {
+  width: 100%;
+
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 0 14px;
+
+  border: 0;
+
+  background: transparent;
+
+  text-align: left;
+
+  color: #3c4043;
+
+  font-size: 14px;
+
+  cursor: pointer;
+}
+
+.context-menu-item:hover {
+  background: #f1f3f4;
+}
+
+.context-menu-item.delete {
+  color: #d93025;
+}
+
+/* ========================================
+   MODAL
+======================================== */
+
+.modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 200;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(32,
+      33,
+      36,
+      0.45);
+
+  padding: 20px;
+}
+
+.event-dialog {
+  width: 100%;
+  max-width: 480px;
+
+  max-height: 90vh;
+
+  overflow: auto;
+
+  border-radius: 12px;
+
+  background: #fff;
+
+  box-shadow:
+    0 8px 32px rgba(60, 64, 67, 0.3);
+}
+
+.dialog-header {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 20px 24px;
+
+  border-bottom: 1px solid #eee;
+}
+
+.dialog-header h2 {
+  margin: 0;
+
+  font-size: 20px;
+  font-weight: 500;
+
+  color: #202124;
+}
+
+.dialog-close {
+  width: 36px;
+  height: 36px;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: transparent;
+
+  color: #5f6368;
+
+  font-size: 26px;
+
+  cursor: pointer;
+}
+
+.dialog-close:hover {
+  background: #f1f3f4;
+}
+
+/* ========================================
+   FORM
+======================================== */
+
+.event-dialog form {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+
+  margin-bottom: 7px;
+
+  font-size: 13px;
+  font-weight: 500;
+
+  color: #5f6368;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+
+  border: 1px solid #dadce0;
+
+  border-radius: 6px;
+
+  outline: none;
+
+  padding: 10px 12px;
+
+  font-size: 14px;
+
+  color: #202124;
+
+  background: #fff;
+
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.form-group input {
+  height: 42px;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: #1a73e8;
+
+  box-shadow:
+    0 0 0 2px rgba(26,
+      115,
+      232,
+      0.15);
+}
+
+/* ========================================
+   DIALOG FOOTER
+======================================== */
+
+.dialog-footer {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 10px;
+
+  padding-top: 10px;
+}
+
+.primary-button,
+.secondary-button {
+  height: 40px;
+
+  padding: 0 18px;
+
+  border-radius: 5px;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.primary-button {
+  border: 0;
+
+  background: #1a73e8;
+
+  color: #fff;
+}
+
+.primary-button:hover {
+  background: #1765cc;
+}
+
+.secondary-button {
+  border: 1px solid #dadce0;
+
+  background: #fff;
+
+  color: #3c4043;
+}
+
+.secondary-button:hover {
+  background: #f8f9fa;
+}
+
+/* ========================================
+   DETAIL
+======================================== */
+
+.event-detail {
+  padding: 24px;
+}
+
+.detail-title {
+  margin-bottom: 24px;
+
+  font-size: 22px;
+  font-weight: 500;
+
+  color: #202124;
+}
+
+.detail-row {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 14px;
+
+  margin-bottom: 20px;
+
+  color: #3c4043;
+
+  font-size: 14px;
+
+  line-height: 21px;
+}
+
+.detail-icon {
+  width: 22px;
+
+  flex-shrink: 0;
+
+  text-align: center;
+}
+
+/* ========================================
+   DAY HEADER CLICKABLE
+======================================== */
+
+.day-header-clickable {
+  cursor: pointer;
+}
+
+.day-header-clickable:hover {
+  background: #f1f3f4;
+}
+
+.day-header-clickable:focus-visible {
+  outline: 2px solid #1a73e8;
+  outline-offset: -2px;
+}
+
+/* ========================================
+   DAY VIEW
+======================================== */
+
+.day-view-body {
+  padding: 16px 24px;
+
+  max-height: 55vh;
+
+  overflow: auto;
+}
+
+.day-view-empty {
+  margin: 12px 0;
+
+  color: #70757a;
+
+  font-size: 14px;
+}
+
+.day-view-list {
+  list-style: none;
+
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.day-view-item {
+  display: flex;
+  flex-direction: column;
+
+  gap: 3px;
+
+  padding: 10px 12px;
+
+  border: 1px solid #dadce0;
+
+  border-left: 3px solid #1a73e8;
+
+  border-radius: 6px;
+
+  cursor: pointer;
+
+  transition: background 0.12s;
+}
+
+.day-view-item:hover {
+  background: #f8f9fa;
+}
+
+.day-view-time {
+  font-size: 12px;
+
+  color: #5f6368;
+}
+
+.day-view-title {
+  font-size: 14px;
+  font-weight: 500;
+
+  color: #202124;
+}
+
+.day-view-footer {
+  padding: 12px 24px 20px;
+}
+
+/* ========================================
+   CONFIRM DIALOG
+======================================== */
+
+.confirm-dialog {
+  width: 100%;
+  max-width: 400px;
+
+  border-radius: 12px;
+
+  background: #fff;
+
+  box-shadow:
+    0 8px 32px rgba(60, 64, 67, 0.3);
+}
+
+.confirm-body {
+  padding: 8px 24px 4px;
+
+  color: #3c4043;
+
+  font-size: 14px;
+
+  line-height: 21px;
+}
+
+.confirm-footer {
+  padding: 16px 24px 20px;
+}
+
+.danger-button {
+  height: 40px;
+
+  padding: 0 18px;
+
+  border: 0;
+
+  border-radius: 5px;
+
+  background: #d93025;
+
+  color: #fff;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+}
+
+.danger-button:hover {
+  background: #c5221f;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+/* Tablet & nhỏ hơn */
+@media (max-width: 900px) {
+  .days-header,
+  .calendar-grid {
+    grid-template-columns:
+      56px repeat(7,
+        minmax(120px, 1fr));
+
+    min-width: 900px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  /*
+   * Cuộn ngang áp cho toàn app để header và body cuộn
+   * đồng bộ, giữ các cột luôn thẳng hàng.
+   */
+  .calendar-app {
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .calendar-header {
+    overflow: visible;
+
+    scrollbar-gutter: auto;
+
+    width: max-content;
+
+    min-width: 100%;
+  }
+
+  .calendar-toolbar {
+    height: 56px;
+    padding: 0 8px;
+
+    /* Toolbar bám trái khi cuộn ngang */
+    position: sticky;
+    left: 0;
+  }
+
+  .toolbar-left {
+    gap: 2px;
+  }
+
+  .toolbar-left h1 {
+    font-size: 15px;
+    margin-left: 8px;
+  }
+
+  .today-button {
+    display: none;
+  }
+
+  .nav-button {
+    width: 32px;
+    height: 32px;
+    font-size: 24px;
+  }
+
+  /*
+   * Trên mobile, mỗi cột ngày rộng cố định ~72px và
+   * cho phép cuộn ngang để xem đủ 7 ngày.
+   */
+  .days-header,
+  .calendar-grid {
+    grid-template-columns:
+      44px repeat(7, 72px);
+
+    min-width: 0;
+    width: max-content;
+  }
+
+  .day-header {
+    height: 58px;
+    gap: 3px;
+  }
+
+  .day-name {
+    font-size: 10px;
+  }
+
+  .day-number {
+    width: 28px;
+    height: 28px;
+    font-size: 15px;
+  }
+
+  .time-label {
+    font-size: 10px;
+  }
+
+  .time-label span {
+    padding-left: 2px;
+  }
+
+  /*
+   * Body chỉ cuộn dọc; cuộn ngang do .calendar-app xử lý
+   * nên header và lưới luôn thẳng cột.
+   */
+  .calendar-body {
+    height: calc(100vh - 116px);
+
+    width: max-content;
+
+    min-width: 100%;
+  }
+
+  .calendar-scroll {
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    scrollbar-gutter: auto;
+
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Event card trên màn nhỏ: thu nhỏ text để hiển thị đủ */
+  .event-card {
+    left: 2px;
+    right: 2px;
+    padding: 3px 5px;
+  }
+
+  .event-title {
+    font-size: 11px;
+  }
+
+  .event-time {
+    font-size: 9px;
+  }
+
+  .event-card-compact {
+    padding: 1px 5px;
+  }
+
+  .event-card-compact .event-title {
+    font-size: 10px;
+    line-height: 1.2;
+  }
+
+  .event-card-compact .event-time {
+    font-size: 8px;
+    line-height: 1.15;
+  }
+
+  /* Modal / dialog gần full màn hình */
+  .modal-overlay {
+    padding: 0;
+
+    align-items: flex-end;
+  }
+
+  .event-dialog,
+  .confirm-dialog {
+    max-width: 100%;
+
+    width: 100%;
+
+    max-height: 92vh;
+
+    border-radius: 16px 16px 0 0;
+  }
+
+  .dialog-header {
+    padding: 16px 18px;
+  }
+
+  .event-dialog form,
+  .event-detail,
+  .day-view-body {
+    padding: 18px;
+  }
+
+  /* Nút footer xếp dọc, full width, dễ chạm */
+  .dialog-footer,
+  .confirm-footer,
+  .day-view-footer {
+    flex-direction: column-reverse;
+
+    gap: 8px;
+  }
+
+  .primary-button,
+  .secondary-button,
+  .danger-button {
+    width: 100%;
+    height: 44px;
+  }
+
+  /* Context menu rộng hơn cho ngón tay */
+  .context-menu {
+    width: 190px;
+  }
+
+  .context-menu-item {
+    height: 46px;
+    font-size: 15px;
+  }
+}
